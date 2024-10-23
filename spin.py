@@ -4,7 +4,7 @@ from datetime import datetime
 
 def initialize_session_state():
     if 'spins_left' not in st.session_state:
-        st.session_state.spins_left = 1
+        st.session_state.spins_left = 3
     if 'current_tickets' not in st.session_state:
         st.session_state.current_tickets = 0
     if 'high_scores' not in st.session_state:
@@ -13,7 +13,7 @@ def initialize_session_state():
         )
         # Add a dummy score
         dummy_score = pd.DataFrame({
-            'Player': ['BKS'],
+            'Player': ['Bill'],
             'Score': [100],
             'Date': [datetime.now().strftime("%Y-%m-%d %H:%M")]
         })
