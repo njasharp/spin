@@ -4,15 +4,24 @@ from datetime import datetime
 
 def initialize_session_state():
     if 'spins_left' not in st.session_state:
-        st.session_state.spins_left = 3
+        st.session_state.spins_left = 1
     if 'current_tickets' not in st.session_state:
         st.session_state.current_tickets = 0
     if 'high_scores' not in st.session_state:
         st.session_state.high_scores = pd.DataFrame(
             columns=['Player', 'Score', 'Date']
         )
+        # Add a dummy score
+        dummy_score = pd.DataFrame({
+            'Player': ['BKS'],
+            'Score': [100],
+            'Date': [datetime.now().strftime("%Y-%m-%d %H:%M")]
+        })
+        st.session_state.high_scores = pd.concat([st.session_state.high_scores, dummy_score], ignore_index=True)
     if 'game_active' not in st.session_state:
         st.session_state.game_active = True
+    if 'spin_result' not in st.session_state:
+        st.session_state.spin_result = None
 
 def submit_score():
     player_name = st.session_state.player_name
@@ -203,8 +212,9 @@ def create_spin_wheel_app():
 
                 // Listen for messages from Streamlit
                 window.addEventListener("message", function(event) {
-                    if (event.data.type === "update_spins") {
-                        // Handle spin update
+                    if (event.data.type === "spin_result") {
+                        // Handle spin result from JavaScript and send to Streamlit
+                        window.streamlitAPI.setComponentValue(event.data.value);
                     }
                 });
             </script>
@@ -253,17 +263,14 @@ def create_spin_wheel_app():
     st.sidebar.info("build by darryl")
 
     # Handle spin result from JavaScript
-    if st.session_state.spins_left > 0 and st.session_state.game_active:
-        current_value = st.query_params.get("spin_result", None)
-        if current_value is not None:
-            current_value = int(current_value)
-            st.session_state.current_tickets += current_value
-            st.session_state.spins_left -= 1
-            if st.session_state.spins_left == 0:
-                st.session_state.game_active = False
-            # Resetting query params after spin
-            st.query_params.clear()
-            st.rerun()
+    spin_result = st.session_state.get("spin_result")
+    if st.session_state.spins_left > 0 and st.session_state.game_active and spin_result is not None:
+        st.session_state.current_tickets += int(spin_result)
+        st.session_state.spins_left -= 1
+        st.session_state.spin_result = None  # Clear the spin result
+        if st.session_state.spins_left == 0:
+            st.session_state.game_active = False
+        st.rerun()
 
 if __name__ == "__main__":
     create_spin_wheel_app()
