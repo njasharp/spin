@@ -1,2 +1,2 @@
 # spin
-![image](https://github.com/user-attachments/assets/ee1804f5-4150-499a-ab2d-ecad4df0a824)
+![image](https://github.com/user-attachments/assets/3cbe0f42-ae3e-40b4-a4ca-d2cf8e4ef8df)
