@@ -28,6 +28,7 @@ def submit_score():
         st.session_state.spins_left = 3
         st.session_state.current_tickets = 0
         st.session_state.game_active = True
+        st.session_state.player_name = ""  # Clear the name after submission
         st.rerun()
 
 def create_spin_wheel_app():
@@ -96,7 +97,7 @@ def create_spin_wheel_app():
                     color = d3.scale.category20();
 
                 var data = [
-                    {"label": "10🎟️", "value": 10,  "question": "10 Ticket"},
+                    {"label": "10🎟️", "value": 10,  "question": "10 Tickets"},
                     {"label": "20🎟️", "value": 20,  "question": "20 Tickets"},
                     {"label": "30🎟️", "value": 30,  "question": "30 Tickets"},
                     {"label": "40🎟️", "value": 40,  "question": "40 Tickets"},
@@ -138,7 +139,7 @@ def create_spin_wheel_app():
                     d.innerRadius = 0;
                     d.outerRadius = r;
                     d.angle = (d.startAngle + d.endAngle) / 2;
-                    return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")translate(" + (d.outerRadius - 10) + ")";
+                    return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")translate(" + (d.outerRadius - 10) + ")"; 
                 })
                 .attr("text-anchor", "end")
                 .text(function(d, i){ return data[i].label; });
@@ -240,6 +241,7 @@ def create_spin_wheel_app():
             st.button("Submit Score", on_click=submit_score, disabled=not st.session_state.get('player_name', '').strip())
 
     # Add instructions
+    st.sidebar.image("p1.png")
     with st.sidebar.expander("How to Play"):
         st.write("""
         1. You have 3 spins per game
@@ -249,6 +251,7 @@ def create_spin_wheel_app():
         5. Try to get on the leaderboard!
         """)
     st.sidebar.info("build by darryl")
+
     # Handle spin result from JavaScript
     if st.session_state.spins_left > 0 and st.session_state.game_active:
         current_value = st.query_params.get("spin_result", None)
@@ -258,6 +261,7 @@ def create_spin_wheel_app():
             st.session_state.spins_left -= 1
             if st.session_state.spins_left == 0:
                 st.session_state.game_active = False
+            # Resetting query params after spin
             st.query_params.clear()
             st.rerun()
 
